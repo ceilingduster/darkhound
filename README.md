@@ -9,6 +9,13 @@ Security hunting platform with a web UI, SSH-based asset sessions, hunt modules,
 - Findings, timeline, and enrichment events over WebSocket.
 - Docker-based dev environment (Postgres, Vault, backend, frontend).
 
+## Default Credentials
+
+```
+username: admin
+password: changeme
+```
+
 ## Architecture
 
 - Backend: FastAPI app in backend/app
