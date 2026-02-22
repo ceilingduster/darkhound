@@ -1,0 +1,6 @@
+services:
+  backend:
+    command:
+      ["uvicorn", "app.main:asgi_app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--reload-dir", "/app"]
+    environment:
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3500,http://127.0.0.1:3500,http://172.16.0.65:3500}

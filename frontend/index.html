@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DarkHound</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0b0f14;
+        --panel: #111824;
+        --panel-2: #0f1622;
+        --panel-3: #0b111a;
+        --text: #e8eef6;
+        --muted: #b2bdcf;
+        --muted-2: #8d97aa;
+        --border: #243348;
+        --accent: #4db2ff;
+        --accent-2: #7cf1c7;
+        --danger: #ff6b6b;
+        --warning: #f7c36a;
+        --success: #8be39c;
+        --chip: #1c2636;
+        --font-ui: 'Space Grotesk', sans-serif;
+        --font-mono: 'JetBrains Mono', monospace;
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      html { background: var(--bg); }
+      body {
+        font-family: var(--font-ui);
+        background:
+          radial-gradient(1200px 600px at 20% -10%, #1a2331 0%, transparent 60%),
+          linear-gradient(180deg, #0b0f14 0%, #0a0f16 100%);
+        color: var(--text);
+        font-size: 16px;
+        line-height: 1.5;
+        height: 100vh;
+        overflow: hidden;
+      }
+      * {
+        scrollbar-width: thin;
+        scrollbar-color: #3a4a63 #0b111a;
+      }
+      a {
+        color: var(--accent);
+        text-decoration: underline;
+        text-decoration-style: dotted;
+        text-underline-offset: 3px;
+        cursor: pointer;
+      }
+      a:hover {
+        color: #79c7ff;
+      }
+      *::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      *::-webkit-scrollbar-track {
+        background: #0b111a;
+      }
+      *::-webkit-scrollbar-thumb {
+        background-color: #3a4a63;
+        border-radius: 10px;
+        border: 2px solid #0b111a;
+      }
+      *::-webkit-scrollbar-thumb:hover {
+        background-color: #4b5e7a;
+      }
+      #root { height: 100vh; display: flex; flex-direction: column; }
+
+      @keyframes ai-spin {
+        to { transform: rotate(360deg); }
+      }
+      @keyframes ai-pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.3; }
+      }
+      @keyframes ai-blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0; }
+      }
+
+      /* Markdown report dark-theme styles */
+      .md-report h1, .md-report h2, .md-report h3 {
+        color: var(--accent-2);
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 6px;
+        margin: 18px 0 10px;
+        font-weight: 600;
+      }
+      .md-report h1 { font-size: 18px; }
+      .md-report h2 { font-size: 15px; }
+      .md-report h3 { font-size: 14px; color: var(--accent); border: none; }
+      .md-report p { margin: 8px 0; }
+      .md-report ul, .md-report ol {
+        padding-left: 20px;
+        margin: 6px 0;
+      }
+      .md-report li { margin: 4px 0; }
+      .md-report li::marker { color: var(--muted-2); }
+      .md-report strong { color: var(--accent-2); }
+      .md-report code {
+        background: var(--panel-2);
+        padding: 2px 5px;
+        border-radius: 3px;
+        font-family: var(--font-mono);
+        font-size: 12px;
+        color: var(--accent);
+      }
+      .md-report pre {
+        background: var(--panel-2);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 10px 12px;
+        overflow-x: auto;
+        margin: 8px 0;
+      }
+      .md-report pre code {
+        background: none;
+        padding: 0;
+        font-size: 12px;
+        color: var(--text);
+      }
+      .md-report blockquote {
+        border-left: 3px solid var(--accent);
+        margin: 8px 0;
+        padding: 4px 12px;
+        color: var(--muted);
+        background: var(--panel-2);
+        border-radius: 0 4px 4px 0;
+      }
+      .md-report table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 10px 0;
+        font-size: 13px;
+      }
+      .md-report th {
+        background: var(--panel-3);
+        color: var(--accent-2);
+        text-align: left;
+        padding: 6px 10px;
+        border: 1px solid var(--border);
+        font-weight: 600;
+      }
+      .md-report td {
+        padding: 6px 10px;
+        border: 1px solid var(--border);
+        color: var(--text);
+      }
+      .md-report tr:nth-child(even) td { background: var(--panel-2); }
+      .md-report hr {
+        border: none;
+        border-top: 1px solid var(--border);
+        margin: 14px 0;
+      }
+      .md-report a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      .md-report a:hover { text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
