@@ -1,6 +1,13 @@
 # DarkHound
 Security hunting platform with a web UI, SSH-based asset sessions, hunt modules, AI-assisted analysis, and intelligence findings.
 
+# Pictures
+
+![Image 1](docs/ui/configurable-hunting.png)
+![Image 2](docs/ui/login.png)
+![Image 3](docs/ui/report.png)
+![Image 4](docs/ui/session.png)
+
 ## Pre-requisites
 
 - **Docker** and **Docker Compose** (recommended — runs everything in containers, not much else needed!)
