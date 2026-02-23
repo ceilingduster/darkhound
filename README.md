@@ -1,6 +1,9 @@
 # DarkHound
 Security hunting platform with a web UI, SSH-based asset sessions, hunt modules, AI-assisted analysis, and intelligence findings.
 
+# Disclaimer
+This project is the product of excessive caffeine and far too much Claude AI usage.  However, I have spent a great deal of time optimizing and polishing the code.  I've tested it on several VM's I have and its amazing how much visibility it can uncover.  Using better AI Models for the executive reporting will result in best results.  It has been tested with Ollama running PHI3 to Llama3.1.  I still recommend a cloud based model unless you have the DGX boxes to spare for better models. YMMV.
+
 # Pictures
 
 ![Image 1](docs/ui/configurable-hunting.png)
