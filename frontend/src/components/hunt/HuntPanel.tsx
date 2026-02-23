@@ -307,7 +307,18 @@ export function HuntPanel({ sessionId, onStepSelect, onAiSelect }: HuntPanelProp
                     title="Copy to clipboard"
                     onClick={() => {
                       if (activeHunt.reasoning_text) {
-                        navigator.clipboard.writeText(activeHunt.reasoning_text);
+                        if (navigator.clipboard?.writeText) {
+                          navigator.clipboard.writeText(activeHunt.reasoning_text);
+                        } else {
+                          const ta = document.createElement('textarea');
+                          ta.value = activeHunt.reasoning_text;
+                          ta.style.position = 'fixed';
+                          ta.style.opacity = '0';
+                          document.body.appendChild(ta);
+                          ta.select();
+                          document.execCommand('copy');
+                          document.body.removeChild(ta);
+                        }
                       }
                     }}
                   >

@@ -1,3 +1,5 @@
+name: darkhound
+
 services:
   postgres:
     image: postgres:16-alpine
@@ -12,7 +14,7 @@ services:
     ports:
       - "5432:5432"
     networks:
-      - aihunter
+      - darkhound
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U darkhound"]
       interval: 10s
@@ -30,7 +32,7 @@ services:
     volumes:
       - ./vault/config.hcl:/vault/config/config.hcl:ro
     networks:
-      - aihunter
+      - darkhound
     command: vault server -dev
     healthcheck:
       test: ["CMD", "vault", "status", "-address=http://127.0.0.1:8200"]
@@ -52,27 +54,16 @@ services:
       vault:
         condition: service_healthy
     environment:
+      # Container-specific overrides (these differ from .env defaults)
       DATABASE_URL: postgresql+asyncpg://darkhound:darkhound@postgres:5432/darkhound
       APP_ENV: development
       SECRET_KEY: ${SECRET_KEY:-change-me-in-production-at-least-32-chars}
       VAULT_ENABLED: "false"
       VAULT_ADDR: http://vault:8200
-      AI_PROVIDER: ${AI_PROVIDER:-anthropic}
-      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
-      ANTHROPIC_MODEL: ${ANTHROPIC_MODEL:-claude-opus-4-6}
-      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
-      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4o}
-      OPENAI_BASE_URL: ${OPENAI_BASE_URL:-}
-      OLLAMA_HOST: ${OLLAMA_HOST:-http://localhost:11434}
-      OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.1}
-      VIRUSTOTAL_API_KEY: ${VIRUSTOTAL_API_KEY:-}
-      SHODAN_API_KEY: ${SHODAN_API_KEY:-}
-      ABUSEIPDB_API_KEY: ${ABUSEIPDB_API_KEY:-}
-      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3500}
       ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-changeme}
     networks:
-      - aihunter
+      - darkhound
     volumes:
       - ../backend:/app
       - ../alembic:/alembic
@@ -90,13 +81,13 @@ services:
     ports:
       - "3500:3500"
     networks:
-      - aihunter
+      - darkhound
     depends_on:
       - backend
 
 networks:
-  aihunter:
-    name: aihunter
+  darkhound:
+    name: darkhound
 
 volumes:
   postgres_data:

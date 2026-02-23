@@ -372,7 +372,7 @@ export function SessionWorkspace({ sessionId }: SessionWorkspaceProps) {
         sighting_count: 1,
         first_seen: new Date().toISOString(),
         kind: 'ai_report',
-        report_text: 'AI analysis pending...',
+        report_text: '',
         report_summary: null,
         stix_bundle: null,
         remediation: null,

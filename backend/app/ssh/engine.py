@@ -96,9 +96,16 @@ class SshConnection:
             error_msg = str(exc)
             logger.error("SSH connect failed: session=%s error=%s retry=%d", self.session_id, error_msg, self._retry_count)
             await emit_event(SshError(session_id=self.session_id, error_code="CONNECT_FAILED", message=error_msg))
+            await session_manager.transition(self.session_id, SessionState.FAILED.value, reason=error_msg)
+            raise SshConnectionError(error_msg) from exc
 
-            if self._retry_count >= self._max_retries:
-                await session_manager.transition(self.session_id, SessionState.FAILED.value, reason="max retries exceeded")
+        except Exception as exc:
+            # Catch auth failures (PermissionDenied, KeyExchangeFailed, etc.)
+            # and any other unexpected errors so the session never hangs.
+            error_msg = str(exc)
+            logger.error("SSH connect failed: session=%s error=%s", self.session_id, error_msg)
+            await emit_event(SshError(session_id=self.session_id, error_code="CONNECT_FAILED", message=error_msg))
+            await session_manager.transition(self.session_id, SessionState.FAILED.value, reason=error_msg)
             raise SshConnectionError(error_msg) from exc
 
     def _get_fingerprint(self) -> str:

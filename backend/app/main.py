@@ -38,6 +38,24 @@ async def lifespan(app: FastAPI):
     from app.hunt.loader import module_registry
     module_registry.load_all()
 
+    # Clean up orphaned sessions from previous server runs.
+    # After a restart the in-memory session_manager is empty, so any DB
+    # sessions still in non-terminal states are stale and unreachable.
+    from app.core.db.engine import AsyncSessionLocal
+    from app.core.db.models import Session as SessionModel, SessionState
+    from sqlalchemy import update as sa_update
+    async with AsyncSessionLocal() as db:
+        result = await db.execute(
+            sa_update(SessionModel)
+            .where(SessionModel.state.notin_([SessionState.TERMINATED, SessionState.FAILED]))
+            .values(state=SessionState.TERMINATED)
+            .returning(SessionModel.id)
+        )
+        orphaned = result.scalars().all()
+        await db.commit()
+        if orphaned:
+            logger.info("Cleaned up %d orphaned session(s) from previous run", len(orphaned))
+
     # Start bus drain background task
     drain_task = asyncio.create_task(bus_drain_loop())
 

@@ -112,6 +112,38 @@ _PROVIDERS: dict[str, type[AiProvider]] = {
 }
 
 
+def validate_ai_config() -> tuple[bool, str]:
+    """Check that the AI provider is valid and its required settings are present.
+
+    Returns ``(True, "")`` when the configuration looks good, or
+    ``(False, "human-readable error message")`` when something is missing.
+    """
+    name = settings.ai_provider.lower()
+    if name not in _PROVIDERS:
+        return False, (
+            f"Unknown AI provider '{settings.ai_provider}'. "
+            f"Set AI_PROVIDER to one of: {', '.join(_PROVIDERS)}"
+        )
+
+    if name == "anthropic" and not settings.anthropic_api_key:
+        return False, (
+            "Anthropic API key is not configured. "
+            "Set ANTHROPIC_API_KEY in your .env file to enable AI analysis."
+        )
+    if name == "openai" and not settings.openai_api_key:
+        return False, (
+            "OpenAI API key is not configured. "
+            "Set OPENAI_API_KEY in your .env file to enable AI analysis."
+        )
+    if name == "ollama" and not settings.ollama_host:
+        return False, (
+            "Ollama host is not configured. "
+            "Set OLLAMA_HOST in your .env file to enable AI analysis."
+        )
+
+    return True, ""
+
+
 def get_provider() -> AiProvider:
     """Return an AiProvider instance based on ``settings.ai_provider``."""
     name = settings.ai_provider.lower()

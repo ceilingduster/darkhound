@@ -19,7 +19,7 @@ from app.core.events.schema import (
 )
 from app.core.session.manager import session_manager
 from .confidence import normalize_confidence, severity_to_confidence_floor
-from .providers import get_provider, is_retryable
+from .providers import get_provider, is_retryable, validate_ai_config
 from .reasoning import ReasoningAssembler, extract_findings_from_markdown
 from .schema import AiAnalysisResult, AiFinding
 
@@ -140,7 +140,24 @@ async def _run_analysis(
     observations: list[dict],
     db: AsyncSession,
 ) -> int:
-    provider = get_provider()
+    # ── Validate AI configuration before attempting analysis ──────────
+    config_ok, config_error = validate_ai_config()
+    if not config_ok:
+        logger.warning("AI configuration invalid — skipping analysis for hunt %s: %s", hunt_id, config_error)
+        await emit_event(
+            AiError(session_id=session_id, error=config_error, retryable=False)
+        )
+        return 0
+
+    try:
+        provider = get_provider()
+    except Exception as exc:
+        logger.warning("Failed to initialise AI provider for hunt %s: %s", hunt_id, exc)
+        await emit_event(
+            AiError(session_id=session_id, error=f"AI provider initialisation failed: {exc}", retryable=False)
+        )
+        return 0
+
     assembler = ReasoningAssembler()
 
     await emit_event(
@@ -196,10 +213,11 @@ async def _run_analysis(
             )
 
     except Exception as exc:
+        logger.error("AI streaming failed for hunt %s: %s", hunt_id, exc)
         await emit_event(
-            AiError(session_id=session_id, error=str(exc), retryable=is_retryable(exc))
+            AiError(session_id=session_id, error=f"AI analysis failed: {exc}", retryable=is_retryable(exc))
         )
-        raise
+        return 0
 
     # Guard: discard excessively long responses
     if len(full_text) > MAX_AI_RESPONSE_LENGTH:

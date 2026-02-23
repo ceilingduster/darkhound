@@ -9,6 +9,7 @@ from pydantic import BaseModel
 from sqlalchemy import select, update
 
 from app.core.db.models import Asset, Session as SessionModel, SessionMode, SessionState, OsType
+from app.core.events.emitter import emit_event
 from app.core.session.manager import session_manager
 from .deps import CurrentUser, DbDep
 
@@ -100,10 +101,25 @@ async def _connect_session(session_id: str, asset_id: str, host: str, port: int,
 
     except SshConnectionError as exc:
         logger.error("SSH connect failed for session %s: %s", session_id, exc)
-        # Session is already transitioned to FAILED by SshConnection.connect() after max retries
+        # SshConnection.connect() already transitions to FAILED and emits SshError.
+        # Ensure the DB row is also updated.
+        try:
+            async with AsyncSessionLocal() as db:
+                ctx = session_manager.get(session_id)
+                if ctx and ctx.state != SessionState.FAILED.value:
+                    await session_manager.transition(session_id, SessionState.FAILED.value, reason=str(exc), db=db)
+                    await db.commit()
+        except Exception:
+            pass
     except Exception as exc:
         logger.error("Session %s connect task failed: %s", session_id, exc, exc_info=True)
         try:
+            from app.core.events.schema import SshError as SshErrorEvent
+            await emit_event(SshErrorEvent(
+                session_id=session_id,
+                error_code="CONNECT_FAILED",
+                message=str(exc),
+            ))
             async with AsyncSessionLocal() as db:
                 await session_manager.transition(session_id, SessionState.FAILED.value, reason=str(exc), db=db)
                 await db.commit()

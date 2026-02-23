@@ -9,7 +9,7 @@ class InvalidTransitionError(Exception):
 
 # Allowed transitions: from_state -> set of valid to_states
 _TRANSITIONS: dict[SessionState, set[SessionState]] = {
-    SessionState.INITIALIZING: {SessionState.CONNECTING},
+    SessionState.INITIALIZING: {SessionState.CONNECTING, SessionState.FAILED},
     SessionState.CONNECTING: {SessionState.CONNECTED, SessionState.FAILED},
     SessionState.CONNECTED: {SessionState.RUNNING, SessionState.TERMINATED},
     SessionState.RUNNING: {
